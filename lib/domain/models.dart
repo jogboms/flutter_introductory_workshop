@@ -30,7 +30,32 @@ class Wine {
   int get hashCode =>
       id.hashCode ^ name.hashCode ^ imagePath.hashCode ^ year.hashCode ^ rating.hashCode ^ createdAt.hashCode;
 
+  Wine copyWith({String? name, String? imagePath, int? year, int? rating}) => Wine(
+        id: id,
+        name: name ?? this.name,
+        imagePath: imagePath ?? this.imagePath,
+        year: year ?? this.year,
+        rating: rating ?? this.rating,
+        createdAt: createdAt,
+      );
+
+  bool get isNotComplete => name.isEmpty || year == 0;
+
+  bool get isEmpty => name.isEmpty && imagePath.isEmpty && year == 0;
+
   @override
   String toString() =>
       'Wine{id: $id, name: $name, imagePath: $imagePath, year: $year, rating: $rating, createdAt: $createdAt}';
+}
+
+enum SortType { none, name, rating, year, createdAt }
+
+extension SortTypeExtension on SortType {
+  String get displayName => <SortType, String>{
+        SortType.none: 'None',
+        SortType.name: 'Name',
+        SortType.rating: 'Rating',
+        SortType.year: 'Year',
+        SortType.createdAt: 'Created Date',
+      }[this]!;
 }
