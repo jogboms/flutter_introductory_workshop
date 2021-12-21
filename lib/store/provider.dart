@@ -16,3 +16,7 @@ class StoreProvider extends InheritedWidget {
   @override
   bool updateShouldNotify(StoreProvider oldWidget) => store != oldWidget.store;
 }
+
+extension StoreProviderExtension on BuildContext {
+  Store get store => StoreProvider.of(this);
+}
