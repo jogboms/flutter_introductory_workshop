@@ -1,4 +1,4 @@
-import 'package:flutter_introductory_workshop/main.dart';
+import 'package:flutter_introductory_workshop/app.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
