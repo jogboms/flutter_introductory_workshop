@@ -1,37 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
-void main() {
-  runApp(const App());
-}
+import 'app.dart';
+import 'data.dart';
+import 'domain.dart';
+import 'store.dart';
 
-class App extends StatefulWidget {
-  const App({Key? key}) : super(key: key);
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
 
-  @override
-  State<App> createState() => _AppState();
-}
+  await CameraService.initialize();
 
-class _AppState extends State<App> {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData.dark(),
-      home: const HomePage(title: 'Flutter Demo Home Page'),
-    );
-  }
-}
+  await Hive.initFlutter();
+  Hive.registerAdapter(WineRepositoryHiveImpl.adapter);
+  await Hive.openBox<Wine>(WineRepositoryHiveImpl.boxName);
+  final WineRepository repository = WineRepositoryHiveImpl(Hive.box<Wine>(WineRepositoryHiveImpl.boxName));
 
-class HomePage extends StatelessWidget {
-  const HomePage({Key? key, required this.title}) : super(key: key);
+  final Store store = Store(repository);
+  await store.initialize();
 
-  final String title;
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text(title)),
-      body: const Center(child: Text('Hello world')),
-    );
-  }
+  runApp(App(store: store));
 }
