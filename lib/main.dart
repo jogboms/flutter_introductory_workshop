@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
+const String imagesApi = 'https://flutter-introductory-workshop.vercel.app/api/images';
 final Store store = Store();
 
 void main() {
@@ -143,7 +144,7 @@ class _DetailsPageState extends State<DetailsPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
-            const AspectRatio(aspectRatio: 2.5, child: ColoredBox(color: Colors.grey)),
+            AspectRatio(aspectRatio: 1.5, child: Image.network('$imagesApi/${widget.wine.imageId}')),
             const SizedBox(height: 24),
             TextFormField(
               initialValue: widget.wine.name,
@@ -231,7 +232,39 @@ class WineCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          const AspectRatio(aspectRatio: 1, child: ColoredBox(color: Colors.grey)),
+          AspectRatio(
+            aspectRatio: 1,
+            child: Stack(
+              children: <Widget>[
+                Positioned.fill(child: Image.network('$imagesApi/${wine.imageId}')),
+                Positioned(
+                  bottom: 8,
+                  right: 8,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+                    decoration: BoxDecoration(color: Colors.black38, borderRadius: BorderRadius.circular(10)),
+                    child: Row(
+                      children: <Widget>[
+                        Icon(
+                          Icons.calendar_today,
+                          color: Theme.of(context).colorScheme.onPrimary.withOpacity(.75),
+                          size: 14,
+                        ),
+                        const SizedBox(width: 6),
+                        Text(
+                          wine.year.toString(),
+                          style: Theme.of(context).textTheme.caption?.copyWith(
+                                fontWeight: FontWeight.bold,
+                                color: Theme.of(context).colorScheme.onPrimary,
+                              ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
           const SizedBox(height: 6),
           Expanded(
             child: Padding(
@@ -328,7 +361,7 @@ class Store with ChangeNotifier {
 
   Wine add() {
     final String id = shortHash(1000 + Random().nextInt(1000));
-    final Wine wine = Wine(id: id, name: '', rating: 0, year: 0);
+    final Wine wine = Wine(id: id, imageId: 1 + Random().nextInt(35), name: '', rating: 0, year: 0);
     _items.putIfAbsent(id, () => wine);
     notifyListeners();
     return wine;
@@ -342,16 +375,23 @@ class Store with ChangeNotifier {
   void update(String id, {String? name, int? year, int? rating}) {
     _items.update(
       id,
-      (Wine prev) => Wine(id: prev.id, name: name ?? prev.name, rating: rating ?? prev.rating, year: year ?? prev.year),
+      (Wine prev) => Wine(
+        id: prev.id,
+        imageId: prev.imageId,
+        name: name ?? prev.name,
+        rating: rating ?? prev.rating,
+        year: year ?? prev.year,
+      ),
     );
     notifyListeners();
   }
 }
 
 class Wine {
-  const Wine({required this.id, required this.name, required this.rating, required this.year});
+  const Wine({required this.id, required this.imageId, required this.name, required this.rating, required this.year});
 
   final String id;
+  final int imageId;
   final String name;
   final int rating;
   final int year;
@@ -361,15 +401,16 @@ class Wine {
       identical(this, other) ||
       runtimeType == other.runtimeType &&
           id == other.id &&
+          imageId == other.imageId &&
           name == other.name &&
           rating == other.rating &&
           year == other.year;
 
   @override
-  int get hashCode => id.hashCode ^ name.hashCode ^ rating.hashCode ^ year.hashCode;
+  int get hashCode => id.hashCode ^ imageId.hashCode ^ name.hashCode ^ rating.hashCode ^ year.hashCode;
 
   @override
-  String toString() => 'Wine{id: $id, name: $name, rating: $rating, year: $year}';
+  String toString() => 'Wine{id: $id, imageId:$imageId, name: $name, rating: $rating, year: $year}';
 }
 
 enum SortType { none, name, rating, year }
